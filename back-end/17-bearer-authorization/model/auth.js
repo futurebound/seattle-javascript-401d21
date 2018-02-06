@@ -52,7 +52,9 @@ Auth.methods.generateCompareHash = function() { //VENICIO - TOKEN SEED
   return this.save()
   //if protecting against brute force, have helper function that would use a counter to stop further attempts
     .then(() => Promise.resolve(this.compareHash)) //explicit Promise resolve, pass back the created compareHash
-    .catch(() => this.generateCompareHash()); //calls until we get a UNIQUE COMPARE HASH, NOT very robust with security, potential loop
+    // .catch(() => this.generateCompareHash()); //calls until we get a UNIQUE COMPARE HASH, NOT very robust with security, potential loop
+    //changed to console.error
+    .catch(console.error);
 };
 
 Auth.methods.generateToken = function() {

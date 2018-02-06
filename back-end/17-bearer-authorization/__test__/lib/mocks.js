@@ -6,8 +6,9 @@ const debug = require('debug')('http:mock')
 
 const mock = module.exports = {};
 
-// Auth Mocks - One, Many, RemoveAll
+// different mocks
 mock.auth = {};
+mock.gallery = {};
 
 mock.auth.createOne = () => {
   let result = {};
@@ -53,3 +54,23 @@ mock.auth.createMany = n =>
   Promise.all(new Array(n).fill(0).map(mock.auth.createOne));
 
 mock.auth.removeAll = () => Promise.all([Auth.remove()]);
+
+//MOCK FOR GALLERY AYY
+mock.gallery.createOne = () => {
+  let resultMock = {}; //variable to hold all results of the mocks
+
+  //create mock for auth/user, then 
+  //can either hardcode auth/user, or use mocks
+  return mock.auth.createOne()
+    .then(createdAuthMock => resultMock = createdAuthMock) //implicit return
+    //could also resultMock.user = createdAuth
+    .then(createdAuthMock => {
+      return new Gallery({
+        name: faker.internet.domainWord(),
+        description: faker.internet.words(15),
+        userId: createdAuthMock.auth._id,
+      }) //vinicio - something being saved into MongoDB CAN .SAVE() HERE INSTEAD 
+    })
+    .then(gallery => resultMock.gallery = gallery); //implicit return is the resultMock.gallery
+    // .then() 
+};
