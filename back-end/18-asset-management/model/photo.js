@@ -22,7 +22,7 @@ const Photo = mongoose.Schema({
 //Photo.static is built in function on constructor, for example we don't have a schema until after we upload, so gotta be static on constructor since there is NO INSTANCE YET
 
 //allows ability to pass photo DATA off to this method, going to make call to S3 middleware, which will then send photo off to S3, becomes own req/res cycle, which will send us back metadata, which we can then capture and save in MongoDB
-Photo.static.upload = function(req) {
+Photo.statics.upload = function(req) {
   return new Promise((resolve, reject) => {
     if(!req.file) return reject(new Error('Multi-part Form Data Error. File not present on request.'));
     if(!req.file.path) return reject(new Error('Multi-part Form Data Error. File path not present on request.'));
@@ -37,7 +37,7 @@ Photo.static.upload = function(req) {
     //creating data points for file AFTER been uploaded to S3, so then can package up and save to MongoDB
     return awsS3.uploadProm(params) //method we create in awsS3 module, DOES ALL HEAVY LIFTING and ships off data to S3
       .then(data => { //ON SUCCESS, get photo data back
-        // del([`${tempDir}/*`]) //place where we store temp BINARY data, DEL package is shortcut for fs.unlink which DELETES the temp space, as long as S3 completes process and gives us data back
+        del([`${tempDir}/${req.file.filename}`]); //place where we store temp BINARY data, DEL package is shortcut for fs.unlink which DELETES the temp space, as long as S3 completes process and gives us data back
         //temp gives you ability to evaluate, log, check things, etc before storing
 
         let photoData = { //represents data we pass into new photo schema instance
