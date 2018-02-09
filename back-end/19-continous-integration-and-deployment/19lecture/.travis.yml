@@ -1,0 +1,25 @@
+language: node_js
+node_js:
+  - 'stable'
+services: #both installs and starts
+  - mongodb
+addons:
+  apt:
+    sources: #set up an ubunto toolchain and install these packages
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-5
+      - g++-5
+env:
+  - CXX=g++-5
+sudo: required #need sudo so we can override some commands its gonna run
+#safelist ---- can do either whitelist or blacklist (only these or all but these)
+branches: #config for our app
+  only: #only want master/test_branch to recognize. if someone opens a PR to either of these, Travis CI will fire
+    - master
+    - test_branch #can change these to be whatever we want, - staging or - development
+  # except: #blacklist
+before_script: npm i #hey before you run any the things, run npm i
+script: #list of scripts it needs to run, in serial (-i)
+  # - npm run lint # would run lint before running tests
+  - npm run test
